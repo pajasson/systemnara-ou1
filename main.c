@@ -17,24 +17,7 @@ int main(int argc, char *argv[]) {
     read = fopen(argv[1], "r");
 
     list* listan = new_list();
-    //fillUsers(read, listan);
-
-    user *namn = malloc(sizeof(user));
-    user *namn2 = malloc(sizeof(user));
-    user *namn3 = malloc(sizeof(user));
-
-    namn->userName = "kuken";
-    namn->uid = 10;
-
-    namn2->userName = "kuk2";
-    namn2->uid = 20;
-
-    namn3->userName = "kuk3";
-    namn3->uid = 30;
-
-    insert(listan, namn);
-    insert(listan, namn2);
-    insert(listan, namn3);
+    fillUsers(read, listan);
 
     element* out = inspect(listan, 3);
     printf("\nUsername: %s", ((user*)out)->userName);
