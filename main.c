@@ -36,13 +36,15 @@ void fillUsers(FILE* read, list* l){
     int i = 0;
     int lineCount = 0;
     int divideCount = 0;
-    bool addItem = true;
+    int fieldCount = 0;
+    bool addItem;
 
 
 
     while(fgets(rows, 1023, read) != NULL){
         i = 0;
         divideCount = 0;
+        fieldCount = 0;
         addItem = true;
         lineCount++;
         if (rows[0] == '\n'){
@@ -55,22 +57,22 @@ void fillUsers(FILE* read, list* l){
             }
             i++;
         }
-        if(divideCount != 6){
+        if(divideCount != 6 && addItem){
             fprintf(stderr, "Line %d: Invalid format: %s\n", lineCount, rows);
             addItem = false;
         }
         i = 0;
         //********username********
         printf("\n\nusername: ");
-        while(rows[i] != ':'){
+        while(rows[i] != ':' && addItem){
             printf("%c", rows[i]);
             i++;
         }
         user *namn = malloc(sizeof(user));
         rows[i] = 0;
-        if (i >= 1 && i <= 31) {
+        if (i >= 1 && i <= 31 && addItem) {
             namn->userName = strdup(rows);
-        } else {
+        } else if(addItem){
             fprintf(stderr, "Line %d: Username \"%s\" has invalid length. Expected to be 1-32 characters.\n", lineCount, rows);
             addItem = false;
         }
@@ -80,17 +82,13 @@ void fillUsers(FILE* read, list* l){
         do {
             printf("%c ", rows[i]);
             i++;
-        }while (rows[i] != ':' && addItem);
+        }while (rows[i] != ':');
         rows[i] = 0;
         i++;
         startNr = i;
         //*******uid*********
         printf("\nuid: ");
-        while (rows[i] != ':' && addItem) {
-            if
-            if(rows[i] < '0' || rows[i] > '9'){
-                //std out error grejs ingen insert(ska va siffra)
-            }
+        while (rows[i] != ':') {
             printf("%c", rows[i]);
             i++;
         }
@@ -99,17 +97,23 @@ void fillUsers(FILE* read, list* l){
         endNr = &rows[i];
         //om uid är positivt
         nrTemp = strtol(rows + startNr, &endNr, 10);
-        if (nrTemp >= 0 && addItem) {
-            namn->uid = nrTemp;
-        } else {
-            //nått stdout error grejs (ingen insert)
+        if((rows + startNr)!= endNr){
+            if (nrTemp >= 0) {
+                namn->uid = nrTemp;
+            }else{
+                fprintf(stderr, "Line %d: Uid must be positive\n", lineCount);
+                addItem = false;
+            }
+        }else{
+            fprintf(stderr, "Line %d: Uid must be a number, got %s\n", lineCount, rows + startNr);
+            addItem = false;
         }
 
         //******GID********
 
         startNr = i;
         printf("\ngid: ");
-        while (rows[i] != ':' && addItem) {
+        while (rows[i] != ':') {
             if(rows[i] < '0' || rows[i] > '9'){
                 //std out error grejs ingen insert(ska va siffra)
             }
@@ -128,7 +132,7 @@ void fillUsers(FILE* read, list* l){
         }
         //********GECOS******
         printf("\nGECOS : ");
-        while (rows[i] != ':' && addItem) {
+        while (rows[i] != ':') {
             printf("%c", rows[i]);
             rows[i] = rows[i];
             i++;
@@ -138,33 +142,36 @@ void fillUsers(FILE* read, list* l){
         //********directory*******
 
         printf("\ndirectory : ");
-        while (rows[i] != ':'&& addItem) {
+        while (rows[i] != ':') {
             printf("%c", rows[i]);
             rows[i] = rows[i];
             i++;
+            fieldCount++;
         }
-        if (i >= 1) {
-            //printf("\nbra\n");
-        } else {
-            //nått stdout error grejs (ingen insert)
+        if (fieldCount < 1) {
+            fprintf(stderr, "Line %d: Directory field can not be empty\n", lineCount);
+            addItem = false;
         }
         rows[i] = 0;
         i++;
 
         //********shell*******
+        fieldCount = 0;
         printf("\nshell : ");
-        while (rows[i] != NULL && addItem){
+        while (rows[i] != NULL){
             printf("%c", rows[i]);
             i++;
+            fieldCount++;
         }
-        if (i >= 1) {
-
-        } else {
-            //nått stdout error grejs (ingen insert)
+        if (fieldCount < 2) {
+            fprintf(stderr, "Line %d: Shell field can not be empty\n", lineCount);
+            addItem = false;
         }
         memset(&rows[0], NULL, sizeof(rows));
         if(addItem){
             insert(l, namn);
+        }else{
+            free(namn);
         }
     }
 }
