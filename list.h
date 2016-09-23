@@ -25,8 +25,10 @@ typedef struct {
 list* new_list(void);
 int size(list* l);
 element* inspect(list* l, int index);
+node* next(node* n);
+node* prev(node* n);
 void delete(list* l, int position);
 bool isEmpty(list* l);
 void insert(list* l, element* value);
-
+void swapElement(list* l, int a, int b);
 #endif //OU1_LIST_H

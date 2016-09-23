@@ -9,6 +9,7 @@ typedef struct user{
 }user;
 
 void fillUsers(FILE* read, list* l);
+void sortListUid(list* l);
 
 int main(int argc, char *argv[]) {
 
@@ -22,8 +23,32 @@ int main(int argc, char *argv[]) {
     element* out = inspect(listan, 1);
     printf("\nUsername: %s", ((user*)out)->userName);
     printf("\nUID: %ld", ((user*)out)->uid);
+
+    element* out2 = inspect(listan, 2);
+    printf("\nUsername: %s", ((user*)out2)->userName);
+    printf("\nUID: %ld", ((user*)out2)->uid);
+
+    swapElement(listan,1,2);
+    out = inspect(listan, 1);
+    out2 = inspect(listan, 2);
+    printf("\nUsername: %s", ((user*)out)->userName);
+    printf("\nUID: %ld", ((user*)out)->uid);
+
+    printf("\nUsername: %s", ((user*)out2)->userName);
+    printf("\nUID: %ld", ((user*)out2)->uid);
     printf("\n%d", size(listan));
 
+    sortListUid(listan);
+    int i = 1;
+    while(i < size(listan)){
+        printf("%ld:%s\n", ((user*)(inspect(listan ,i)))->uid, ((user*)(inspect(listan ,i)))->userName);
+        i++;
+    }
+    while(i < size(listan)){
+        free(((user*)(inspect(listan ,i)))->userName);
+        free
+        i++;
+    }
     return 0;
 }
 
@@ -114,9 +139,6 @@ void fillUsers(FILE* read, list* l){
         startNr = i;
         printf("\ngid: ");
         while (rows[i] != ':') {
-            if(rows[i] < '0' || rows[i] > '9'){
-                //std out error grejs ingen insert(ska va siffra)
-            }
             printf("%c", rows[i]);
             i++;
         }
@@ -125,10 +147,16 @@ void fillUsers(FILE* read, list* l){
         endNr = &rows[i];
         //om GID är positivt
         nrTemp = strtol(rows + startNr, &endNr, 10);
-        if (nrTemp >= 0 && addItem) {
-            namn->uid = strtol(rows + startNr, &endNr, 10);
-        } else {
-            //nått stdout error grejs (ingen insert)
+        if((rows + startNr)!= endNr){
+            if (nrTemp >= 0) {
+                namn->uid = nrTemp;
+            }else{
+                fprintf(stderr, "Line %d: Uid must be positive\n", lineCount);
+                addItem = false;
+            }
+        }else{
+            fprintf(stderr, "Line %d: Uid must be a number, got %s\n", lineCount, rows + startNr);
+            addItem = false;
         }
         //********GECOS******
         printf("\nGECOS : ");
@@ -172,6 +200,20 @@ void fillUsers(FILE* read, list* l){
             insert(l, namn);
         }else{
             free(namn);
+        }
+    }
+}
+
+void sortListUid(list* l){
+    int i;
+    int j;
+    for (i = 1 ; i <= size(l) - 1; i++) {
+        j = i;
+
+        while ( j > 0 && ((user*)(inspect(l ,j)))->uid < ((user*)(inspect(l, j-1)))->uid) {
+            swapElement(l,j,j-1);
+
+            j--;
         }
     }
 }

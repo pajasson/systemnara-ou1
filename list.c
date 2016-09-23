@@ -28,6 +28,14 @@ node* next(node* n){
     return NULL;
 }
 
+node* prev(node* n){
+
+    if(n->previous != NULL){
+        return n->previous;
+    }
+    return NULL;
+}
+
 element* inspect(list* l, int index){
     node* n = l->first;
     for(int i = 1; i <= index; i++){
@@ -87,6 +95,26 @@ void delete(list* l, int position){
     free(nremove);
 }
 
-/*void swap(list* l, node* a, node* b){
+void swapElement(list* l, int a, int b){
 
-}*/
+    if(!isEmpty(l)){
+        node* n1 = l->first;
+        node* n2 = l->first;
+        element* tmp;
+        int i = 1;
+        while(i < a){
+            n1 = next(n1);
+            i++;
+        }
+        i = 1;
+        while(i < b){
+            n2 = next(n2);
+            i++;
+        }
+        tmp = n1->value;
+        n1->value = n2->value;
+        n2->value = tmp;
+
+    }
+
+}
