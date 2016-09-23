@@ -20,24 +20,6 @@ int main(int argc, char *argv[]) {
     list* listan = new_list();
     fillUsers(read, listan);
 
-    element* out = inspect(listan, 1);
-    printf("\nUsername: %s", ((user*)out)->userName);
-    printf("\nUID: %ld", ((user*)out)->uid);
-
-    element* out2 = inspect(listan, 2);
-    printf("\nUsername: %s", ((user*)out2)->userName);
-    printf("\nUID: %ld", ((user*)out2)->uid);
-
-    swapElement(listan,1,2);
-    out = inspect(listan, 1);
-    out2 = inspect(listan, 2);
-    printf("\nUsername: %s", ((user*)out)->userName);
-    printf("\nUID: %ld", ((user*)out)->uid);
-
-    printf("\nUsername: %s", ((user*)out2)->userName);
-    printf("\nUID: %ld", ((user*)out2)->uid);
-    printf("\n%d", size(listan));
-
     sortListUid(listan);
     int i = 1;
     while(i < size(listan)){
@@ -68,15 +50,18 @@ void fillUsers(FILE* read, list* l){
 
 
     while(fgets(rows, 1023, read) != NULL){
+
         i = 0;
         divideCount = 0;
         fieldCount = 0;
         addItem = true;
         lineCount++;
+        //check for empty lines
         if (rows[0] == '\n'){
             fprintf(stderr, "Line %d: Encountered a <BLANKLINE>\n", lineCount);
             addItem = false;
         }
+        //check if the line is in the correct format with 6 ':'
         while(rows[i] != '\n' && addItem) {
             if(rows[i] == ':'){
                 divideCount++;
@@ -89,9 +74,7 @@ void fillUsers(FILE* read, list* l){
         }
         i = 0;
         //********username********
-        printf("\n\nusername: ");
         while(rows[i] != ':' && addItem){
-            printf("%c", rows[i]);
             i++;
         }
         user *namn = malloc(sizeof(user));
@@ -104,18 +87,14 @@ void fillUsers(FILE* read, list* l){
         }
         i++;
         //*********password********
-        printf("\npassword: ");
         do {
-            printf("%c ", rows[i]);
             i++;
         }while (rows[i] != ':');
         rows[i] = 0;
         i++;
         startNr = i;
         //*******uid*********
-        printf("\nuid: ");
         while (rows[i] != ':') {
-            printf("%c", rows[i]);
             i++;
         }
         rows[i] = 0;
@@ -134,19 +113,14 @@ void fillUsers(FILE* read, list* l){
             fprintf(stderr, "Line %d: Uid must be a number, got %s\n", lineCount, rows + startNr);
             addItem = false;
         }
-
         //******GID********
-
         startNr = i;
-        printf("\ngid: ");
         while (rows[i] != ':') {
-            printf("%c", rows[i]);
             i++;
         }
         rows[i] = 0;
         i++;
         endNr = &rows[i];
-        //om GID är positivt
         nrTemp = strtol(rows + startNr, &endNr, 10);
         if((rows + startNr)!= endNr){
             if (nrTemp >= 0) {
@@ -160,19 +134,14 @@ void fillUsers(FILE* read, list* l){
             addItem = false;
         }
         //********GECOS******
-        printf("\nGECOS : ");
         while (rows[i] != ':') {
-            printf("%c", rows[i]);
             rows[i] = rows[i];
             i++;
         }
         rows[i] = 0;
         i++;
         //********directory*******
-
-        printf("\ndirectory : ");
         while (rows[i] != ':') {
-            printf("%c", rows[i]);
             rows[i] = rows[i];
             i++;
             fieldCount++;
@@ -186,9 +155,7 @@ void fillUsers(FILE* read, list* l){
 
         //********shell*******
         fieldCount = 0;
-        printf("\nshell : ");
         while (rows[i] != NULL){
-            printf("%c", rows[i]);
             i++;
             fieldCount++;
         }
