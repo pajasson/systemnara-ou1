@@ -5,7 +5,7 @@
 
 typedef struct user{
     long uid;
-    char* userName; //free(namn->userName)
+    char* userName;
 }user;
 
 void fillUsers(FILE* read, list* l);
@@ -26,7 +26,8 @@ int main(int argc, char *argv[]) {
         printf("%ld:%s\n", ((user*)(inspect(listan ,i)))->uid, ((user*)(inspect(listan ,i)))->userName);
         i++;
     }
-    while(i < size(listan)){
+    i = 1;
+    while(i <= size(listan)){
         free(((user*)(inspect(listan ,i)))->userName);
         free(inspect(listan ,i));
         i++;
@@ -92,8 +93,8 @@ void fillUsers(FILE* read, list* l){
         }while (rows[i] != ':');
         rows[i] = 0;
         i++;
-        startNr = i;
         //*******uid*********
+        startNr = i;
         while (rows[i] != ':') {
             i++;
         }
@@ -101,16 +102,12 @@ void fillUsers(FILE* read, list* l){
         i++;
         endNr = &rows[i];
         nrTemp = strtol(rows + startNr, &endNr, 10);
-        if((rows + startNr)!= endNr){
-            if (nrTemp >= 0) {
-                namn->uid = nrTemp;
-            }else{
-                fprintf(stderr, "Line %d: Uid must be positive\n", lineCount);
-                addItem = false;
-            }
+        if(nrTemp < 0 && addItem){
+            fprintf(stderr, "Line %d: Uid must be positive\n", lineCount);
+        }else if ( *endNr != 0 && addItem) {
+            fprintf(stderr, "Line %d: Uid must be a number, got \"%s\"\n", lineCount, rows + startNr);
         }else{
-            fprintf(stderr, "Line %d: Uid must be a number, got %s\n", lineCount, rows + startNr);
-            addItem = false;
+            namn->uid = nrTemp;
         }
         //******GID********
         startNr = i;
@@ -121,16 +118,10 @@ void fillUsers(FILE* read, list* l){
         i++;
         endNr = &rows[i];
         nrTemp = strtol(rows + startNr, &endNr, 10);
-        if((rows + startNr)!= endNr){
-            if (nrTemp >= 0) {
-                namn->uid = nrTemp;
-            }else{
-                fprintf(stderr, "Line %d: Uid must be positive\n", lineCount);
-                addItem = false;
-            }
-        }else{
-            fprintf(stderr, "Line %d: Uid must be a number, got %s\n", lineCount, rows + startNr);
-            addItem = false;
+        if(nrTemp < 0 && addItem){
+            fprintf(stderr, "Line %d: Gid must be positive\n", lineCount);
+        }else if ( *endNr != 0 && addItem) {
+            fprintf(stderr, "Line %d: Gid must be a number, got \"%s\"\n", lineCount, rows + startNr);
         }
         //********GECOS******
         while (rows[i] != ':') {
@@ -166,6 +157,7 @@ void fillUsers(FILE* read, list* l){
         if(addItem){
             insert(l, (element*)namn);
         }else{
+            free(namn->userName);
             free(namn);
         }
     }
