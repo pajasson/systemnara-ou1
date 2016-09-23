@@ -7,12 +7,12 @@
 
 list* new_list(void){
 
-    list* list = malloc(sizeof(list));
+    list* l = malloc(sizeof(list));
 
-    list->first = NULL;
-    list->last = NULL;
+    l->first = NULL;
+    l->last = NULL;
 
-    return list;
+    return l;
 }
 
 bool isEmpty(list* l){

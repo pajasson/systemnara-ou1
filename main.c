@@ -14,7 +14,9 @@ void sortListUid(list* l);
 int main(int argc, char *argv[]) {
 
     FILE* read;
-
+    if(argc != 2){
+        printf("kukerror");
+    }
     read = fopen(argv[1], "r");
 
     list* listan = new_list();
@@ -74,7 +76,7 @@ void fillUsers(FILE* read, list* l){
             addItem = false;
         }
         i = 0;
-        //********username********
+        /********username********/
         while(rows[i] != ':' && addItem){
             i++;
         }
@@ -87,13 +89,13 @@ void fillUsers(FILE* read, list* l){
             addItem = false;
         }
         i++;
-        //*********password********
+        /*********password********/
         do {
             i++;
         }while (rows[i] != ':');
         rows[i] = 0;
         i++;
-        //*******uid*********
+        /*******uid*********/
         startNr = i;
         while (rows[i] != ':') {
             i++;
@@ -123,14 +125,14 @@ void fillUsers(FILE* read, list* l){
         }else if ( *endNr != 0 && addItem) {
             fprintf(stderr, "Line %d: Gid must be a number, got \"%s\"\n", lineCount, rows + startNr);
         }
-        //********GECOS******
+        /********GECOS******/
         while (rows[i] != ':') {
             rows[i] = rows[i];
             i++;
         }
         rows[i] = 0;
         i++;
-        //********directory*******
+        /********directory*******/
         while (rows[i] != ':') {
             rows[i] = rows[i];
             i++;
@@ -143,7 +145,7 @@ void fillUsers(FILE* read, list* l){
         rows[i] = 0;
         i++;
 
-        //********shell*******
+        /********shell*******/
         fieldCount = 0;
         while (rows[i] != '\0'){
             i++;
