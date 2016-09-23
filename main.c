@@ -100,7 +100,6 @@ void fillUsers(FILE* read, list* l){
         rows[i] = 0;
         i++;
         endNr = &rows[i];
-        //om uid är positivt
         nrTemp = strtol(rows + startNr, &endNr, 10);
         if((rows + startNr)!= endNr){
             if (nrTemp >= 0) {
@@ -155,7 +154,7 @@ void fillUsers(FILE* read, list* l){
 
         //********shell*******
         fieldCount = 0;
-        while (rows[i] != NULL){
+        while (rows[i] != '\0'){
             i++;
             fieldCount++;
         }
@@ -163,9 +162,9 @@ void fillUsers(FILE* read, list* l){
             fprintf(stderr, "Line %d: Shell field can not be empty\n", lineCount);
             addItem = false;
         }
-        memset(&rows[0], NULL, sizeof(rows));
+        memset(&rows[0], '\0', sizeof(rows));
         if(addItem){
-            insert(l, namn);
+            insert(l, (element*)namn);
         }else{
             free(namn);
         }
