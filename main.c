@@ -46,9 +46,10 @@ int main(int argc, char *argv[]) {
     }
     while(i < size(listan)){
         free(((user*)(inspect(listan ,i)))->userName);
-        free
+        free(inspect(listan ,i));
         i++;
     }
+    free(listan);
     return 0;
 }
 
