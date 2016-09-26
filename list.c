@@ -44,7 +44,7 @@ element* inspect(list* l, int index){
         }
         n = next(n);
     }
-    return n->value;
+    return NULL;
 }
 
 int size(list* l){
@@ -117,4 +117,18 @@ void swapElement(list* l, int a, int b){
 
     }
 
+}
+void clearList(list* l){
+    node* n1 = l->first;
+    node* n2 = NULL;
+    while(n1->next != NULL){
+        n2 = n1->next;
+        free(n1->value);
+        free(n1);
+        n1 = n2;
+    }
+    if(!isEmpty(l)){
+        free(n1->value);
+        free(n1);
+    }
 }

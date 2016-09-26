@@ -31,4 +31,5 @@ void delete(list* l, int position);
 bool isEmpty(list* l);
 void insert(list* l, element* value);
 void swapElement(list* l, int a, int b);
+void clearList(list* l);
 #endif //OU1_LIST_H

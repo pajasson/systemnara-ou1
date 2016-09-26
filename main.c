@@ -24,26 +24,27 @@ int main(int argc, char *argv[]) {
 
     sortListUid(listan);
     int i = 1;
-    while(i < size(listan)){
+    while(i <= size(listan)){
         printf("%ld:%s\n", ((user*)(inspect(listan ,i)))->uid, ((user*)(inspect(listan ,i)))->userName);
         i++;
     }
     i = 1;
     while(i <= size(listan)){
         free(((user*)(inspect(listan ,i)))->userName);
-        free(inspect(listan ,i));
         i++;
     }
+    clearList(listan);
     free(listan);
+    fclose(read);
     return 0;
 }
 
 void fillUsers(FILE* read, list* l){
 
-    char rows [1023];
-    char* endNr;
-    int startNr;
-    long nrTemp;
+    char rows [1023] = {0};
+    char* endNr = NULL;
+    int startNr = 0;
+    long nrTemp = 0;
     int i = 0;
     int lineCount = 0;
     int divideCount = 0;
@@ -80,7 +81,7 @@ void fillUsers(FILE* read, list* l){
         while(rows[i] != ':' && addItem){
             i++;
         }
-        user *namn = malloc(sizeof(user));
+        user *namn = calloc(1, sizeof(user));
         rows[i] = 0;
         if (i >= 1 && i <= 31 && addItem) {
             namn->userName = strdup(rows);
@@ -111,7 +112,7 @@ void fillUsers(FILE* read, list* l){
         }else{
             namn->uid = nrTemp;
         }
-        //******GID********
+        /******GID********/
         startNr = i;
         while (rows[i] != ':') {
             i++;
@@ -166,12 +167,11 @@ void fillUsers(FILE* read, list* l){
 }
 
 void sortListUid(list* l){
-    int i;
-    int j;
-    for (i = 1 ; i <= size(l) - 1; i++) {
+    int j = 0;
+    for (int i = 1 ; i <= size(l); i++) {
         j = i;
 
-        while ( j > 0 && ((user*)(inspect(l ,j)))->uid < ((user*)(inspect(l, j-1)))->uid) {
+        while ( j > 1 && ((user*)(inspect(l ,j)))->uid < ((user*)(inspect(l, j-1)))->uid) {
             swapElement(l,j,j-1);
 
             j--;
