@@ -89,7 +89,7 @@ void fillUsers(FILE* read, list* l){
             fprintf(stderr, "Line %d: Username \"%s\" has invalid length. Expected to be 1-32 characters.\n", lineCount, rows);
             addItem = false;
         }
-        //i++;
+        i++;
         /*********password********/
         while (rows[i] != ':' && addItem) {
             i++;
@@ -100,32 +100,48 @@ void fillUsers(FILE* read, list* l){
         startNr = i;
         while (rows[i] != ':' && addItem) {
             i++;
+            fieldCount++;
         }
         rows[i] = 0;
         i++;
         endNr = &rows[i];
         nrTemp = strtol(rows + startNr, &endNr, 10);
-        if(nrTemp < 0 && addItem){
-            fprintf(stderr, "Line %d: Uid must be a positive integer.\n", lineCount);
-        }else if ( *endNr != 0 && addItem) {
-            fprintf(stderr, "Line %d: Uid must be a number, got \"%s\".\n", lineCount, rows + startNr);
-        }else{
-            namn->uid = nrTemp;
+        if(fieldCount > 0 && addItem) {
+
+            if (nrTemp < 0 && addItem) {
+                fprintf(stderr, "Line %d: Uid must be a positive integer.\n", lineCount);
+            } else if (*endNr != 0 && addItem) {
+                fprintf(stderr, "Line %d: Uid must be a number, got \"%s\".\n", lineCount, rows + startNr);
+            } else {
+                namn->uid = nrTemp;
+            }
+        }else if(addItem){
+            fprintf(stderr, "Line %d: UID field can not be empty.\n", lineCount);
+            addItem = false;
         }
         /******GID********/
+        fieldCount = 0;
         startNr = i;
         while (rows[i] != ':' && addItem) {
             i++;
+            fieldCount++;
         }
         rows[i] = 0;
         i++;
         endNr = &rows[i];
         nrTemp = strtol(rows + startNr, &endNr, 10);
-        if(nrTemp < 0 && addItem){
-            fprintf(stderr, "Line %d: Gid must be a positive integer.\n", lineCount);
-        }else if ( *endNr != 0 && addItem) {
-            fprintf(stderr, "Line %d: Gid must be a number, got \"%s\".\n", lineCount, rows + startNr);
+        if(fieldCount > 0 && addItem){
+
+            if(nrTemp < 0 && addItem){
+                fprintf(stderr, "Line %d: Gid must be a positive integer.\n", lineCount);
+            }else if ( *endNr != 0 && addItem) {
+                fprintf(stderr, "Line %d: Gid must be a number, got \"%s\".\n", lineCount, rows + startNr);
+            }
+        }else if(addItem){
+            fprintf(stderr, "Line %d: GID field can not be empty.\n", lineCount);
+            addItem = false;
         }
+        fieldCount = 0;
         /********GECOS******/
         while (rows[i] != ':' && addItem) {
             i++;
@@ -143,7 +159,6 @@ void fillUsers(FILE* read, list* l){
         }
         rows[i] = 0;
         i++;
-
         /********shell*******/
         fieldCount = 0;
         while (rows[i] != '\0' && addItem){
@@ -154,10 +169,8 @@ void fillUsers(FILE* read, list* l){
             fprintf(stderr, "Line %d: Shell field can not be empty.\n", lineCount);
             addItem = false;
         }
-        //memset(rows, 0, sizeof(rows));
         if(addItem){
             insert(l, (element*)namn);
-            //printf("%s\n", namn->userName);
         }else{
             free(namn->userName);
             free(namn);
@@ -170,10 +183,8 @@ void sortListUid(list* l){
     int j = 0;
     for (int i = 1 ; i <= size(l); i++) {
         j = i;
-
         while ( j > 1 && ((user*)(inspect(l ,j)))->uid < ((user*)(inspect(l, j-1)))->uid) {
             swapElement(l,j,j-1);
-
             j--;
         }
     }
