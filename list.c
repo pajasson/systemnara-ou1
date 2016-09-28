@@ -7,7 +7,7 @@
 
 list* new_list(void){
 
-    list* l = malloc(sizeof(list));
+    list* l = calloc(1, sizeof(list));
 
     l->first = NULL;
     l->last = NULL;
@@ -56,7 +56,7 @@ void insert(list* l, element* value){
 
     int i = 1;
     if(isEmpty(l)) {
-        node* n1 = malloc(sizeof(node));
+        node* n1 = calloc(1, sizeof(node));
         n1->value = value;
         l->first = n1;
         l->first->index = 1;
@@ -69,7 +69,7 @@ void insert(list* l, element* value){
             n = next(n);
             i++;
         }
-        node* n2 = malloc(sizeof(node));
+        node* n2 = calloc(1, sizeof(node));
         n2->index = i;
         n2->previous = l->last;
         l->last->next = n2;

@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 
 void fillUsers(FILE* read, list* l){
 
-    char rows [1023] = {0};
+    char rows [1023];
     char* endNr = NULL;
     int startNr = 0;
     long nrTemp = 0;
@@ -73,7 +73,7 @@ void fillUsers(FILE* read, list* l){
             i++;
         }
         if(divideCount != 6 && addItem){
-            fprintf(stderr, "Line %d: Invalid format: %s\n", lineCount, rows);
+            fprintf(stderr, "Line %d: Invalid format: %s", lineCount, rows);
             addItem = false;
         }
         i = 0;
@@ -89,16 +89,16 @@ void fillUsers(FILE* read, list* l){
             fprintf(stderr, "Line %d: Username \"%s\" has invalid length. Expected to be 1-32 characters.\n", lineCount, rows);
             addItem = false;
         }
-        i++;
+        //i++;
         /*********password********/
-        do {
+        while (rows[i] != ':' && addItem) {
             i++;
-        }while (rows[i] != ':');
+        }
         rows[i] = 0;
         i++;
         /*******uid*********/
         startNr = i;
-        while (rows[i] != ':') {
+        while (rows[i] != ':' && addItem) {
             i++;
         }
         rows[i] = 0;
@@ -106,15 +106,15 @@ void fillUsers(FILE* read, list* l){
         endNr = &rows[i];
         nrTemp = strtol(rows + startNr, &endNr, 10);
         if(nrTemp < 0 && addItem){
-            fprintf(stderr, "Line %d: Uid must be positive\n", lineCount);
+            fprintf(stderr, "Line %d: Uid must be a positive integer.\n", lineCount);
         }else if ( *endNr != 0 && addItem) {
-            fprintf(stderr, "Line %d: Uid must be a number, got \"%s\"\n", lineCount, rows + startNr);
+            fprintf(stderr, "Line %d: Uid must be a number, got \"%s\".\n", lineCount, rows + startNr);
         }else{
             namn->uid = nrTemp;
         }
         /******GID********/
         startNr = i;
-        while (rows[i] != ':') {
+        while (rows[i] != ':' && addItem) {
             i++;
         }
         rows[i] = 0;
@@ -122,25 +122,23 @@ void fillUsers(FILE* read, list* l){
         endNr = &rows[i];
         nrTemp = strtol(rows + startNr, &endNr, 10);
         if(nrTemp < 0 && addItem){
-            fprintf(stderr, "Line %d: Gid must be positive\n", lineCount);
+            fprintf(stderr, "Line %d: Gid must be a positive integer.\n", lineCount);
         }else if ( *endNr != 0 && addItem) {
-            fprintf(stderr, "Line %d: Gid must be a number, got \"%s\"\n", lineCount, rows + startNr);
+            fprintf(stderr, "Line %d: Gid must be a number, got \"%s\".\n", lineCount, rows + startNr);
         }
         /********GECOS******/
-        while (rows[i] != ':') {
-            rows[i] = rows[i];
+        while (rows[i] != ':' && addItem) {
             i++;
         }
         rows[i] = 0;
         i++;
         /********directory*******/
-        while (rows[i] != ':') {
-            rows[i] = rows[i];
+        while (rows[i] != ':' && addItem) {
             i++;
             fieldCount++;
         }
-        if (fieldCount < 1) {
-            fprintf(stderr, "Line %d: Directory field can not be empty\n", lineCount);
+        if (fieldCount < 1 && addItem) {
+            fprintf(stderr, "Line %d: Directory field can not be empty.\n", lineCount);
             addItem = false;
         }
         rows[i] = 0;
@@ -148,21 +146,23 @@ void fillUsers(FILE* read, list* l){
 
         /********shell*******/
         fieldCount = 0;
-        while (rows[i] != '\0'){
+        while (rows[i] != '\0' && addItem){
             i++;
             fieldCount++;
         }
-        if (fieldCount < 2) {
-            fprintf(stderr, "Line %d: Shell field can not be empty\n", lineCount);
+        if (fieldCount < 2 && addItem) {
+            fprintf(stderr, "Line %d: Shell field can not be empty.\n", lineCount);
             addItem = false;
         }
-        memset(&rows[0], '\0', sizeof(rows));
+        //memset(rows, 0, sizeof(rows));
         if(addItem){
             insert(l, (element*)namn);
+            //printf("%s\n", namn->userName);
         }else{
             free(namn->userName);
             free(namn);
         }
+
     }
 }
 
