@@ -1,26 +1,37 @@
 #include <stdio.h>
 #include "list.h"
 #include <stdlib.h>
-#include <string.h>
+#include "string.h"
+
+#define MAXLINELENGTH 1023
 
 typedef struct user{
     long uid;
     char* userName;
 }user;
 
-void fillUsers(FILE* read, list* l);
+bool fillUsers(FILE* read, list* l);
 void sortListUid(list* l);
-
+/*
+ * The main function for the passwordsort program. it reads from the file specified in the argument
+ * and stores t
+ */
 int main(int argc, char *argv[]) {
 
     FILE* read;
-    if(argc != 2){
-        printf("kukerror");
+    bool result;
+    if (argc == 1){
+        read = stdin;
+    }else {
+        read = fopen(argv[1], "r");
     }
-    read = fopen(argv[1], "r");
+    if (!read){
+        perror(argv[1]);
+        exit(EXIT_FAILURE);
+    }
 
     list* listan = new_list();
-    fillUsers(read, listan);
+    result = fillUsers(read, listan);
 
     sortListUid(listan);
     int i = 1;
@@ -36,12 +47,21 @@ int main(int argc, char *argv[]) {
     clearList(listan);
     free(listan);
     fclose(read);
-    return 0;
+
+    if(!result){
+        exit(EXIT_FAILURE);
+    }
+    exit(0);
 }
+/*
+ * This function reads from the input-file and checks each line for userinformation.
+ * The username and uid-number are saved in "users" and added to the list.
+ * if any errors occurs the function prints a message to stderr and returns
+ * false after its done.
+ */
+bool fillUsers(FILE* read, list* l){
 
-void fillUsers(FILE* read, list* l){
-
-    char rows [1023];
+    char rows [MAXLINELENGTH];
     char* endNr = NULL;
     int startNr = 0;
     long nrTemp = 0;
@@ -50,20 +70,20 @@ void fillUsers(FILE* read, list* l){
     int divideCount = 0;
     int fieldCount = 0;
     bool addItem;
+    bool returnValue = true;
 
-
-
-    while(fgets(rows, 1023, read) != NULL){
+    while(fgets(rows, MAXLINELENGTH, read) != NULL){
 
         i = 0;
         divideCount = 0;
         fieldCount = 0;
         addItem = true;
         lineCount++;
-        //check for empty lines
+        //check if the line is empty
         if (rows[0] == '\n'){
             fprintf(stderr, "Line %d: Encountered a <BLANKLINE>\n", lineCount);
             addItem = false;
+            returnValue = false;
         }
         //check if the line is in the correct format with 6 ':'
         while(rows[i] != '\n' && addItem) {
@@ -75,6 +95,7 @@ void fillUsers(FILE* read, list* l){
         if(divideCount != 6 && addItem){
             fprintf(stderr, "Line %d: Invalid format: %s", lineCount, rows);
             addItem = false;
+            returnValue = false;
         }
         i = 0;
         /********username********/
@@ -88,6 +109,7 @@ void fillUsers(FILE* read, list* l){
         } else if(addItem){
             fprintf(stderr, "Line %d: Username \"%s\" has invalid length. Expected to be 1-32 characters.\n", lineCount, rows);
             addItem = false;
+            returnValue = false;
         }
         i++;
         /*********password********/
@@ -110,14 +132,17 @@ void fillUsers(FILE* read, list* l){
 
             if (nrTemp < 0 && addItem) {
                 fprintf(stderr, "Line %d: Uid must be a positive integer.\n", lineCount);
+                addItem = false;
             } else if (*endNr != 0 && addItem) {
                 fprintf(stderr, "Line %d: Uid must be a number, got \"%s\".\n", lineCount, rows + startNr);
+                addItem = false;
             } else {
                 namn->uid = nrTemp;
             }
         }else if(addItem){
             fprintf(stderr, "Line %d: UID field can not be empty.\n", lineCount);
             addItem = false;
+            returnValue = false;
         }
         /******GID********/
         fieldCount = 0;
@@ -134,12 +159,15 @@ void fillUsers(FILE* read, list* l){
 
             if(nrTemp < 0 && addItem){
                 fprintf(stderr, "Line %d: Gid must be a positive integer.\n", lineCount);
+                addItem = false;
             }else if ( *endNr != 0 && addItem) {
                 fprintf(stderr, "Line %d: Gid must be a number, got \"%s\".\n", lineCount, rows + startNr);
+                addItem = false;
             }
         }else if(addItem){
             fprintf(stderr, "Line %d: GID field can not be empty.\n", lineCount);
             addItem = false;
+            returnValue = false;
         }
         fieldCount = 0;
         /********GECOS******/
@@ -156,6 +184,7 @@ void fillUsers(FILE* read, list* l){
         if (fieldCount < 1 && addItem) {
             fprintf(stderr, "Line %d: Directory field can not be empty.\n", lineCount);
             addItem = false;
+            returnValue = false;
         }
         rows[i] = 0;
         i++;
@@ -168,6 +197,7 @@ void fillUsers(FILE* read, list* l){
         if (fieldCount < 2 && addItem) {
             fprintf(stderr, "Line %d: Shell field can not be empty.\n", lineCount);
             addItem = false;
+            returnValue = false;
         }
         if(addItem){
             insert(l, (element*)namn);
@@ -177,8 +207,11 @@ void fillUsers(FILE* read, list* l){
         }
 
     }
+    return returnValue;
 }
-
+/*
+ * This function performs an insertionsort on the list by UID-nr in ascending order
+ */
 void sortListUid(list* l){
     int j = 0;
     for (int i = 1 ; i <= size(l); i++) {

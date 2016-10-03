@@ -37,19 +37,23 @@ node* prev(node* n){
 }
 
 element* inspect(list* l, int index){
-    node* n = l->first;
-    for(int i = 1; i <= index; i++){
-        if(n->index == index){
-            return n->value;
+    if(!isEmpty(l)){
+        node* n = l->first;
+        for(int i = 1; i <= index; i++){
+            if(n->index == index){
+                return n->value;
+            }
+            n = next(n);
         }
-        n = next(n);
     }
     return NULL;
 }
 
 int size(list* l){
-
-    return l->last->index;
+    if(!isEmpty(l)){
+        return l->last->index;
+    }
+    return 0;
 }
 
 void insert(list* l, element* value){
@@ -85,6 +89,7 @@ void delete(list* l, int position){
     for(int i = 1;i < position;i++){
         n = next(n);
     }
+    free(n->value);
     n->previous->next = n->next;
     n->next->previous = n->previous;
     node* nremove = n;
@@ -119,16 +124,18 @@ void swapElement(list* l, int a, int b){
 
 }
 void clearList(list* l){
-    node* n1 = l->first;
-    node* n2 = NULL;
-    while(n1->next != NULL){
-        n2 = n1->next;
-        free(n1->value);
-        free(n1);
-        n1 = n2;
-    }
+
     if(!isEmpty(l)){
+        node* n1 = l->first;
+        node* n2 = NULL;
+        while(n1->next != NULL){
+            n2 = n1->next;
+            free(n1->value);
+            free(n1);
+            n1 = n2;
+        }
         free(n1->value);
         free(n1);
+
     }
 }
