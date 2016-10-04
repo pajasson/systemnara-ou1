@@ -14,7 +14,8 @@ bool fillUsers(FILE* read, list* l);
 void sortListUid(list* l);
 /*
  * The main function for the passwordsort program. it reads from the file specified in the argument
- * and stores t
+ * and stores the element in a list which is then sorted with an insertionsort based on the elements
+ * UID number
  */
 int main(int argc, char *argv[]) {
 
@@ -212,13 +213,37 @@ bool fillUsers(FILE* read, list* l){
 /*
  * This function performs an insertionsort on the list by UID-nr in ascending order
  */
-void sortListUid(list* l){
+/*void sortListUid(list* l){
     int j = 0;
-    for (int i = 1 ; i <= size(l); i++) {
+    int i;
+    for (i = 1 ; i <= size(l); i++) {
         j = i;
-        while ( j > 1 && ((user*)(inspect(l ,j)))->uid < ((user*)(inspect(l, j-1)))->uid) {
+        while (j > 1 && ((user*)(inspect(l ,j)))->uid < ((user*)(inspect(l, j-1)))->uid) {
             swapElement(l,j,j-1);
             j--;
+        }
+    }
+}*/
+void sortListUid(list* l){
+
+    int i,j,k,num;
+    num = size(l);
+
+    for(i = num / 2; i > 0; i = i/2){
+
+        for(j = i; j < num; j++){
+
+            for(k = j-i + 1; k >= 1; k = k-i){
+
+                if(((user*)(inspect(l ,k+i)))->uid >= ((user*)(inspect(l, k)))->uid){
+
+                    break;
+
+                }else{
+
+                    swapElement(l,k,k+i);
+                }
+            }
         }
     }
 }

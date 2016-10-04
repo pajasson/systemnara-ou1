@@ -39,7 +39,8 @@ node* prev(node* n){
 element* inspect(list* l, int index){
     if(!isEmpty(l)){
         node* n = l->first;
-        for(int i = 1; i <= index; i++){
+        int i;
+        for(i = 1; i <= index; i++){
             if(n->index == index){
                 return n->value;
             }
@@ -86,7 +87,8 @@ void insert(list* l, element* value){
 
 void delete(list* l, int position){
     node* n = l->first;
-    for(int i = 1;i < position;i++){
+    int i;
+    for(i = 1;i < position;i++){
         n = next(n);
     }
     free(n->value);
